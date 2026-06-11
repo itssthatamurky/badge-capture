@@ -1,0 +1,11 @@
+{
+  "name": "Badge Capture",
+  "short_name": "Badges",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#F5F5F5",
+  "theme_color": "#F5F5F5",
+  "icons": [
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
