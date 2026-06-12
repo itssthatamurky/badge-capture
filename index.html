@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <title>Badge Capture</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#F5F5F5">
+  <meta name="theme-color" content="#E9F3F6">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icon-180.png">
   <link rel="icon" href="icon.svg">
@@ -19,7 +19,7 @@
       --ink-2: #4B4B4B;
       --ink-3: #6E6E6E;
       --grey: #8A8A8A;
-      --bg: #F5F5F5;
+      --bg: #E9F3F6;
       --line: #D1D1D1;
       --line-2: #E6E6E6;
       --dark: #2E2E2E;
@@ -129,7 +129,7 @@
     }
     .rowtxt b {
       display: block;
-      font-size: 14px;
+      font-size: 15.5px;
       font-weight: 500;
       white-space: nowrap;
       overflow: hidden;
@@ -137,7 +137,7 @@
     }
     .rowtxt small {
       display: block;
-      font-size: 12.5px;
+      font-size: 14px;
       color: var(--ink-3);
       white-space: nowrap;
       overflow: hidden;
@@ -391,6 +391,24 @@
       letter-spacing: .01em;
     }
     .fields textarea { resize: none; }
+    /* v1.1 polish: blue wash, violet raffle, back-to-list */
+    .stage .flow { display: none; }
+    #search { background: #fff; }
+    #raffle-btn { background: var(--violet); border-color: var(--violet); }
+    #back-list-btn {
+      display: block;
+      width: calc(100% - 28px);
+      margin: 12px 14px 0;
+      padding: 12px;
+      background: #fff;
+      border: 1px solid var(--line-2);
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: .01em;
+      color: var(--ink-2);
+    }
     .saved-hint {
       text-align: center;
       font-size: 11px;
@@ -606,6 +624,7 @@
       <label>Notes<textarea id="f-notes" rows="3"></textarea></label>
     </div>
     <p class="saved-hint">Saved automatically</p>
+    <button id="back-list-btn">Back to list</button>
     <nav class="barbtm">
       <button id="fup-btn" class="pillbtn" aria-pressed="false">Follow up</button>
       <button id="star-btn" class="pillbtn iconly" aria-label="Star" aria-pressed="false"></button>
@@ -795,6 +814,18 @@
     document.getElementById('fup-btn').addEventListener('click',()=>{if(readOnly||!cur)return;cur.followUp=!cur.followUp;commit();paintToggles()});
     document.getElementById('star-btn').addEventListener('click',()=>{if(readOnly||!cur)return;cur.starred=!cur.starred;commit();paintToggles()});
     document.getElementById('back-btn').addEventListener('click',closeDetail);
+    document.getElementById('back-list-btn').addEventListener('click',closeDetail);
+    let swX=0,swY=0;
+    const detView=document.getElementById('view-detail');
+    detView.addEventListener('touchstart',e=>{swX=e.touches[0].clientX;swY=e.touches[0].clientY},{passive:true});
+    detView.addEventListener('touchend',e=>{
+      if(!cur)return;
+      const dx=e.changedTouches[0].clientX-swX, dy=e.changedTouches[0].clientY-swY;
+      if(Math.abs(dx)<60||Math.abs(dy)>50)return;
+      const i=contacts.findIndex(c=>c.id===cur.id);
+      const next=dx<0?contacts[i+1]:contacts[i-1];
+      if(next)openDetail(next.id);
+    },{passive:true});
     document.getElementById('del-btn').addEventListener('click',async()=>{
       if(readOnly||!cur)return;
       if(!confirm('Delete this contact and its photo?'))return;
@@ -966,7 +997,7 @@
       if(readOnly)return;
       const c=newContact(null);
       try{ await dbPut(c); await ensurePersist(); }
-      catch(err){ alert('Could not save — storage may be full. Export now to back up. ['+((err&&err.name)||'')+': '+((err&&err.message)||err)+']'); return }
+      catch(err){ alert('Could not save — if this is a private browsing tab, switch to a regular tab and try again. Otherwise storage may be full; export now to back up. ['+((err&&err.name)||'')+': '+((err&&err.message)||err)+']'); return }
       await renderList();
       openDetail(c.id);
     });
@@ -1013,7 +1044,7 @@
           if(!blob){alert('Could not process that photo — try again.');return}
           c.photo=blob;
           try{ await dbPut(c) }
-          catch(err){ alert('Could not save — storage may be full. Export now to back up. ['+((err&&err.name)||'')+': '+((err&&err.message)||err)+']'); return }
+          catch(err){ alert('Could not save — if this is a private browsing tab, switch to a regular tab and try again. Otherwise storage may be full; export now to back up. ['+((err&&err.name)||'')+': '+((err&&err.message)||err)+']'); return }
           if(cur&&cur.id===rid&&!document.getElementById('view-detail').hidden)paintPhoto();
           renderList();
           return;
@@ -1021,12 +1052,12 @@
       }
       const c=newContact(blob);
       try{ await dbPut(c); await ensurePersist(); }
-      catch(err){ alert('Could not save — storage may be full. Export now to back up. ['+((err&&err.name)||'')+': '+((err&&err.message)||err)+']'); return }
+      catch(err){ alert('Could not save — if this is a private browsing tab, switch to a regular tab and try again. Otherwise storage may be full; export now to back up. ['+((err&&err.name)||'')+': '+((err&&err.message)||err)+']'); return }
       renderList();
     });
 
     openDB().then(renderList).catch(err=>{
-      document.getElementById('list').innerHTML='<li class="empty">Could not open storage — try closing and reopening the app. ['+esc(((err&&err.name)||'')+': '+((err&&err.message)||String(err)))+']</li>';
+      document.getElementById('list').innerHTML='<li class="empty">Could not open storage — if this is a private browsing tab, switch to a regular tab. Otherwise try closing and reopening the app. ['+esc(((err&&err.name)||'')+': '+((err&&err.message)||String(err)))+']</li>';
     });
 
     function show(view) {
