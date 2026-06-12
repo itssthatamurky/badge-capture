@@ -1,4 +1,4 @@
-const C = 'badgecap-v1';
+const C = 'badgecap-v2';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-180.png', './icon-512.png'];
 
 self.addEventListener('install', e => {

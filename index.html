@@ -966,7 +966,7 @@
       if(readOnly)return;
       const c=newContact(null);
       try{ await dbPut(c); await ensurePersist(); }
-      catch(err){ alert('Could not save — storage may be full. Export now to back up.'); return }
+      catch(err){ alert('Could not save — storage may be full. Export now to back up. ['+((err&&err.name)||'')+': '+((err&&err.message)||err)+']'); return }
       await renderList();
       openDetail(c.id);
     });
@@ -1013,7 +1013,7 @@
           if(!blob){alert('Could not process that photo — try again.');return}
           c.photo=blob;
           try{ await dbPut(c) }
-          catch(err){ alert('Could not save — storage may be full. Export now to back up.'); return }
+          catch(err){ alert('Could not save — storage may be full. Export now to back up. ['+((err&&err.name)||'')+': '+((err&&err.message)||err)+']'); return }
           if(cur&&cur.id===rid&&!document.getElementById('view-detail').hidden)paintPhoto();
           renderList();
           return;
@@ -1021,12 +1021,12 @@
       }
       const c=newContact(blob);
       try{ await dbPut(c); await ensurePersist(); }
-      catch(err){ alert('Could not save — storage may be full. Export now to back up.'); return }
+      catch(err){ alert('Could not save — storage may be full. Export now to back up. ['+((err&&err.name)||'')+': '+((err&&err.message)||err)+']'); return }
       renderList();
     });
 
-    openDB().then(renderList).catch(()=>{
-      document.getElementById('list').innerHTML='<li class="empty">Could not open storage — try closing and reopening the app.</li>';
+    openDB().then(renderList).catch(err=>{
+      document.getElementById('list').innerHTML='<li class="empty">Could not open storage — try closing and reopening the app. ['+esc(((err&&err.name)||'')+': '+((err&&err.message)||String(err)))+']</li>';
     });
 
     function show(view) {
